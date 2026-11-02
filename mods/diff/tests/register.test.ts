@@ -28,7 +28,10 @@ describe('register', () => {
     }))
 
     on('fs.list', (_engine, e) => {
-      const isGitDir = e.path === '/work/.git'
+      // A native Windows host hands the synthetic path over normalized, as
+      // C:\work\.git; compare it in POSIX form so every host lists the marker.
+      const posixPath = e.path.replace(/\\/g, '/').replace(/^[A-Za-z]:/, '')
+      const isGitDir = posixPath === '/work/.git'
 
       return { value: isGitDir ? listing : [] }
     })
